@@ -343,6 +343,10 @@ async def main():
                     password = getpass.getpass(
                         "Telegram password (2FA) if enabled: "
                     )
+                    if not password:
+                        raise SystemExit(
+                            "2FA password required. Enable/disable 2FA in Telegram if needed."
+                        )
                     await client.sign_in(password=password)
 
         # Load dialogs to help resolve t.me/c/... links
