@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+
+# Env
+.env
+
+# Telethon session
+*.session
+*.session-journal
+
+# Output
+Downloads/
+downloads/
+
+# Logs & cache
+_logs/
+_cache/
+
+# VS Code
+.vscode/
