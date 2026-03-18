@@ -112,6 +112,16 @@ def build_output_dir(base: Path, entity, msg_id: int, topic_title: str | None) -
     return base / label / str(msg_id)
 
 
+def build_channel_root(base: Path, entity) -> Path:
+    label = (
+        getattr(entity, "username", None)
+        or getattr(entity, "title", None)
+        or str(getattr(entity, "id", "chat"))
+    )
+    label = sanitize_name(str(label))
+    return base / label
+
+
 async def fetch_album_messages(client: TelegramClient, entity, anchor_msg):
     if not anchor_msg.grouped_id:
         return [anchor_msg]
@@ -160,6 +170,21 @@ async def resolve_topic_title(client: TelegramClient, entity, message):
     # Fallback: if the topic message is plain text, use it as the title
     text = getattr(topic_msg, "message", None)
     return text
+
+
+def get_topic_id_from_message(message):
+    reply_to = getattr(message, "reply_to", None)
+    top_msg_id = None
+    if reply_to:
+        top_msg_id = (
+            getattr(reply_to, "reply_to_top_id", None)
+            or getattr(reply_to, "top_msg_id", None)
+        )
+        if not top_msg_id and getattr(reply_to, "forum_topic", False):
+            top_msg_id = getattr(reply_to, "reply_to_msg_id", None)
+    if not top_msg_id:
+        top_msg_id = getattr(message, "topic_id", None)
+    return top_msg_id
 
 
 async def main():
@@ -219,9 +244,25 @@ async def main():
         help="Interactive menu (message vs topic)",
     )
     parser.add_argument(
+        "--all",
+        action="store_true",
+        help="Download all media from the topic if available, otherwise from the channel/group",
+    )
+    parser.add_argument(
+        "--limit",
+        type=int,
+        default=None,
+        help="Limit number of messages to scan (e.g. 500)",
+    )
+    parser.add_argument(
         "--only",
         choices=["photos", "videos"],
         help="Filter media (photos or videos only)",
+    )
+    parser.add_argument(
+        "--skip-forwards",
+        action="store_true",
+        help="Skip forwarded messages",
     )
     parser.add_argument(
         "--no-cache",
@@ -244,10 +285,10 @@ async def main():
     if args.menu:
         print("Menu:")
         print("  1) Download media from the message")
-        print("  2) Download all media from the topic (forum thread)")
-        choice = input("Choix (1/2): ").strip()
+        print("  2) Download all media (topic if available, otherwise channel/group)")
+        choice = input("Choice (1/2): ").strip()
         if choice == "2":
-            args.topic = True
+            args.all = True
         link = input("Paste the Telegram message link: ").strip()
     if not link:
         link = input("Paste the Telegram message link: ").strip()
@@ -318,7 +359,15 @@ async def main():
         if not message:
             raise SystemExit("Message not found or inaccessible.")
 
-        if args.topic:
+        if args.all:
+            top_msg_id = get_topic_id_from_message(message)
+            if top_msg_id:
+                messages = await fetch_topic_messages(client, entity, top_msg_id)
+            else:
+                messages = [
+                    m async for m in client.iter_messages(entity, limit=args.limit)
+                ]
+        elif args.topic:
             reply_to = getattr(message, "reply_to", None)
             top_msg_id = None
             if reply_to:
@@ -339,6 +388,10 @@ async def main():
         if args.only:
             wanted = "image" if args.only == "photos" else "video"
             media_messages = [m for m in media_messages if media_kind(m) == wanted]
+        if args.skip_forwards:
+            media_messages = [
+                m for m in media_messages if not getattr(m, "forward", None)
+            ]
 
         if not media_messages:
             raise SystemExit("No photo or video found in this message.")
@@ -357,7 +410,10 @@ async def main():
                 print(f"Debug reply_to dict: {reply_to.to_dict()!r}")
             print(f"Debug message.topic_id: {getattr(message, 'topic_id', None)!r}")
             print(f"Debug topic_title: {topic_title!r}")
-        output_dir = build_output_dir(output_base, entity, message.id, topic_title)
+        if args.all and not topic_title:
+            output_dir = build_channel_root(output_base, entity)
+        else:
+            output_dir = build_output_dir(output_base, entity, message.id, topic_title)
         output_dir.mkdir(parents=True, exist_ok=True)
 
         print(f"Downloading {len(media_messages)} file(s) to {output_dir}...")
