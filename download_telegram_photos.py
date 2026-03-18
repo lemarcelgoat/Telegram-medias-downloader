@@ -157,7 +157,7 @@ async def resolve_topic_title(client: TelegramClient, entity, message):
     title = getattr(action, "title", None)
     if title:
         return title
-    # Fallback: if the topic message is plain text, use it as title
+    # Fallback: if the topic message is plain text, use it as the title
     text = getattr(topic_msg, "message", None)
     return text
 
@@ -304,7 +304,7 @@ async def main():
                     )
                     await client.sign_in(password=password)
 
-        # Charge les dialogues pour faciliter la resolution des liens t.me/c/...
+        # Load dialogs to help resolve t.me/c/... links
         await client.get_dialogs(limit=200)
 
         if parsed[0] == "username":
