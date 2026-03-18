@@ -418,12 +418,14 @@ async def main():
 
         print(f"Downloading {len(media_messages)} file(s) to {output_dir}...")
         success = 0
+        skipped = 0
         total_bytes = 0
         kind_counts = {"image": 0, "video": 0, "autre": 0}
         kind_bytes = {"image": 0, "video": 0, "autre": 0}
         for msg in tqdm(media_messages, desc="Downloading", unit="file"):
             cache_key = f"{entity.id}:{msg.id}"
             if not args.no_cache and cache.get(cache_key):
+                skipped += 1
                 log_event(
                     log_path,
                     {
@@ -462,6 +464,8 @@ async def main():
         print(
             f"Done. {success}/{len(media_messages)} downloaded, {total_mb:.2f} MB."
         )
+        if skipped:
+            print(f"Skipped: {skipped} already downloaded (cache).")
         print(
             f"Summary: {kind_counts['image']} photo(s), {kind_counts['video']} video(s), {kind_counts['autre']} other(s)."
         )
