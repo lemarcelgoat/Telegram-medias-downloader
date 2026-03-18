@@ -70,7 +70,7 @@ def log_event(log_path: Path | None, payload: dict) -> None:
 
 
 def fmt_mb(value: int) -> str:
-    return f"{value / (1024 * 1024):.2f} Mo"
+    return f"{value / (1024 * 1024):.2f} MB"
 
 
 def is_image_or_video_message(message) -> bool:
@@ -185,76 +185,76 @@ async def main():
         print(f"\x1b[38;2;{r};{g};{b}m{line}\x1b[0m")
     print("")
     parser = argparse.ArgumentParser(
-        description="Telecharge les photos d'un message Telegram a partir d'un lien t.me"
+        description="Download Telegram photos/videos from a t.me message link"
     )
-    parser.add_argument("link", nargs="?", help="Lien du message Telegram")
+    parser.add_argument("link", nargs="?", help="Telegram message link")
     parser.add_argument(
         "--out",
         default=str(Path.home() / "Downloads" / "Telegram"),
-        help="Dossier de sortie (defaut: ~/Downloads/Telegram)",
+        help="Output folder (default: ~/Downloads/Telegram)",
     )
     parser.add_argument(
         "--sms",
         action="store_true",
-        help="Force l'envoi du code par SMS si possible",
+        help="Force SMS code delivery if possible",
     )
     parser.add_argument(
         "--qr",
         action="store_true",
-        help="Connexion via QR code (recommande si l'envoi du code ne marche pas)",
+        help="Login via QR code (recommended if code delivery fails)",
     )
     parser.add_argument(
         "--debug",
         action="store_true",
-        help="Affiche des infos de debug sur le message et le sujet",
+        help="Print debug info about the message and topic",
     )
     parser.add_argument(
         "--topic",
         action="store_true",
-        help="Telecharge tous les medias du sujet (topic) du message",
+        help="Download all media from the topic (forum thread)",
     )
     parser.add_argument(
         "--menu",
         action="store_true",
-        help="Menu interactif (choix entre message ou sujet)",
+        help="Interactive menu (message vs topic)",
     )
     parser.add_argument(
         "--only",
         choices=["photos", "videos"],
-        help="Filtre les medias (photos ou videos uniquement)",
+        help="Filter media (photos or videos only)",
     )
     parser.add_argument(
         "--no-cache",
         action="store_true",
-        help="Desactive le cache anti-doublons",
+        help="Disable duplicate cache",
     )
     parser.add_argument(
         "--no-log",
         action="store_true",
-        help="Desactive le journal JSONL des telechargements",
+        help="Disable JSONL download log",
     )
     parser.add_argument(
         "--reset-cache",
         action="store_true",
-        help="Supprime le cache avant de lancer (optionnel)",
+        help="Reset cache before running (optional)",
     )
     args = parser.parse_args()
 
     link = args.link
     if args.menu:
         print("Menu:")
-        print("  1) Telecharger medias du message")
-        print("  2) Telecharger tous les medias du sujet (topic)")
+        print("  1) Download media from the message")
+        print("  2) Download all media from the topic (forum thread)")
         choice = input("Choix (1/2): ").strip()
         if choice == "2":
             args.topic = True
-        link = input("Colle le lien du message Telegram: ").strip()
+        link = input("Paste the Telegram message link: ").strip()
     if not link:
-        link = input("Colle le lien du message Telegram: ").strip()
+        link = input("Paste the Telegram message link: ").strip()
 
     parsed = parse_link(link)
     if not parsed:
-        raise SystemExit("Lien invalide. Exemple attendu: https://t.me/nomduchannel/123")
+        raise SystemExit("Invalid link. Example: https://t.me/channelname/123")
 
     load_dotenv()
     api_id = os.getenv("TG_API_ID")
@@ -264,20 +264,20 @@ async def main():
 
     if not api_id or not api_hash:
         raise SystemExit(
-            "Variables manquantes. Renseigne TG_API_ID et TG_API_HASH dans un fichier .env."
+            "Missing variables. Set TG_API_ID and TG_API_HASH in a .env file."
         )
 
     try:
         api_id = int(api_id)
     except ValueError as exc:
-        raise SystemExit("TG_API_ID doit etre un entier.") from exc
+        raise SystemExit("TG_API_ID must be an integer.") from exc
 
     client = TelegramClient(session_name, api_id, api_hash)
     try:
         await client.connect()
         if not await client.is_user_authorized():
             if args.qr:
-                print("Ouvre Telegram > Parametres > Appareils > Scanner un QR code.")
+                print("Open Telegram > Settings > Devices > Scan QR code.")
                 qr_login = await client.qr_login()
                 qr = qrcode.QRCode(border=1)
                 qr.add_data(qr_login.url)
@@ -289,18 +289,18 @@ async def main():
                 if not phone:
                     phone = sanitize_phone(
                         input(
-                            "Numero de telephone au format international (ex: +33612345678): "
+                    "Phone number in international format (e.g. +33612345678): "
                         ).strip()
                     )
                 sent = await client.send_code_request(phone, force_sms=args.sms)
-                code = input("Code de connexion Telegram: ").strip()
+                code = input("Telegram login code: ").strip()
                 try:
                     await client.sign_in(
                         phone=phone, code=code, phone_code_hash=sent.phone_code_hash
                     )
                 except SessionPasswordNeededError:
                     password = getpass.getpass(
-                        "Mot de passe Telegram (2FA) si active: "
+                        "Telegram password (2FA) if enabled: "
                     )
                     await client.sign_in(password=password)
 
@@ -316,7 +316,7 @@ async def main():
 
         message = await client.get_messages(entity, ids=msg_id)
         if not message:
-            raise SystemExit("Message introuvable ou inaccessible.")
+            raise SystemExit("Message not found or inaccessible.")
 
         if args.topic:
             reply_to = getattr(message, "reply_to", None)
@@ -331,7 +331,7 @@ async def main():
             if not top_msg_id:
                 top_msg_id = getattr(message, "topic_id", None)
             if not top_msg_id:
-                raise SystemExit("Ce message ne semble pas etre dans un sujet (topic).")
+                raise SystemExit("This message does not seem to be in a topic.")
             messages = await fetch_topic_messages(client, entity, top_msg_id)
         else:
             messages = await fetch_album_messages(client, entity, message)
@@ -341,7 +341,7 @@ async def main():
             media_messages = [m for m in media_messages if media_kind(m) == wanted]
 
         if not media_messages:
-            raise SystemExit("Aucune photo ou video trouvee dans ce message.")
+            raise SystemExit("No photo or video found in this message.")
 
         output_base = Path(args.out)
         cache_path = output_base / "_cache" / "downloaded.json"
@@ -360,12 +360,12 @@ async def main():
         output_dir = build_output_dir(output_base, entity, message.id, topic_title)
         output_dir.mkdir(parents=True, exist_ok=True)
 
-        print(f"Telechargement de {len(media_messages)} fichier(s) vers {output_dir}...")
+        print(f"Downloading {len(media_messages)} file(s) to {output_dir}...")
         success = 0
         total_bytes = 0
         kind_counts = {"image": 0, "video": 0, "autre": 0}
         kind_bytes = {"image": 0, "video": 0, "autre": 0}
-        for msg in tqdm(media_messages, desc="Telechargement", unit="fichier"):
+        for msg in tqdm(media_messages, desc="Downloading", unit="file"):
             cache_key = f"{entity.id}:{msg.id}"
             if not args.no_cache and cache.get(cache_key):
                 log_event(
@@ -404,23 +404,23 @@ async def main():
 
         total_mb = total_bytes / (1024 * 1024)
         print(
-            f"Termine. {success}/{len(media_messages)} telecharge(s), {total_mb:.2f} Mo."
+            f"Done. {success}/{len(media_messages)} downloaded, {total_mb:.2f} MB."
         )
         print(
-            f"Resume: {kind_counts['image']} photo(s), {kind_counts['video']} video(s), {kind_counts['autre']} autre(s)."
+            f"Summary: {kind_counts['image']} photo(s), {kind_counts['video']} video(s), {kind_counts['autre']} other(s)."
         )
         print(
-            "Details tailles: "
+            "Size details: "
             f"photos {fmt_mb(kind_bytes['image'])}, "
             f"videos {fmt_mb(kind_bytes['video'])}, "
-            f"autres {fmt_mb(kind_bytes['autre'])}."
+            f"others {fmt_mb(kind_bytes['autre'])}."
         )
         print("")
-        print("Recapitulatif")
-        print("Type   | Nb | Taille")
+        print("Recap")
+        print("Type   | #  | Size")
         print("image  | {:>2} | {}".format(kind_counts["image"], fmt_mb(kind_bytes["image"])))
         print("video  | {:>2} | {}".format(kind_counts["video"], fmt_mb(kind_bytes["video"])))
-        print("autre  | {:>2} | {}".format(kind_counts["autre"], fmt_mb(kind_bytes["autre"])))
+        print("other  | {:>2} | {}".format(kind_counts["autre"], fmt_mb(kind_bytes["autre"])))
 
         if not args.no_cache:
             save_cache(cache_path, cache)
