@@ -1,4 +1,4 @@
-# Telegram Photo Downloader (perso)
+# Telegram Photo Downloader
 
 Petit script Python pour telecharger les photos et videos d'un message Telegram (y compris les albums) a partir d'un lien t.me.
 
