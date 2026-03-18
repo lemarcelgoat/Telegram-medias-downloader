@@ -18,7 +18,8 @@ pip install -r requirements.txt
 ### Configuration
 
 1. Copy `.env.example` to `.env`.
-2. Fill `TG_API_ID` and `TG_API_HASH` from https://my.telegram.org.
+2. Create an app on https://my.telegram.org (API Development Tools).
+3. Fill `TG_API_ID` and `TG_API_HASH` from that page.
 
 At first run, Telethon will ask for your phone number and the login code.
 
@@ -159,7 +160,8 @@ pip install -r requirements.txt
 ### Configuration
 
 1. Copie `.env.example` vers `.env`.
-2. Renseigne `TG_API_ID` et `TG_API_HASH` depuis https://my.telegram.org.
+2. Crée une app sur https://my.telegram.org (API Development Tools).
+3. Renseigne `TG_API_ID` et `TG_API_HASH` depuis cette page.
 
 Au premier lancement, Telethon te demandera ton numéro de téléphone et le code de connexion.
 
