@@ -1,6 +1,6 @@
 ﻿# Telegram Media Downloader
 
-[EN](#english) | [FR](#francais)
+[EN](#english) | [FR](#français)
 
 ## English
 
