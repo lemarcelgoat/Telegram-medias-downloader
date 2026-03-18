@@ -46,6 +46,12 @@ python download_telegram_photos.py --menu
 # Full topic (forum)
 python download_telegram_photos.py "https://t.me/groupname/123/456" --topic
 
+# Full channel/group
+python download_telegram_photos.py "https://t.me/channelname/123" --all
+
+# Full channel/group (limit scan)
+python download_telegram_photos.py "https://t.me/channelname/123" --all --limit 500
+
 # QR login
 python download_telegram_photos.py "https://t.me/..." --qr
 
@@ -67,6 +73,9 @@ python download_telegram_photos.py "https://t.me/..." --no-log
 # Filter photos or videos
 python download_telegram_photos.py "https://t.me/..." --only photos
 python download_telegram_photos.py "https://t.me/..." --only videos
+
+# Skip forwarded messages
+python download_telegram_photos.py "https://t.me/..." --skip-forwards
 ```
 
 ### UX: progress + summary
@@ -100,6 +109,20 @@ To download all media from a forum topic:
 python download_telegram_photos.py "https://t.me/groupname/123/456" --topic
 ```
 
+### Full channel/group
+
+To download all media from a channel or group:
+
+```bash
+python download_telegram_photos.py "https://t.me/channelname/123" --all
+```
+
+Limit the scan:
+
+```bash
+python download_telegram_photos.py "https://t.me/channelname/123" --all --limit 500
+```
+
 ### Interactive menu
 
 ```bash
@@ -120,14 +143,14 @@ In forum groups, the folder uses the topic name when available.
 - It downloads images and videos.
 - It only works if you can access the message.
 
-## Francais
+## Français
 
-Petit script Python pour telecharger les photos et videos d'un message Telegram (y compris les albums) a partir d'un lien t.me.
+Petit script Python pour télécharger les photos et vidéos d’un message Telegram (y compris les albums) à partir d’un lien t.me.
 
 ### Installation
 
-1. Cree un environnement Python (optionnel mais recommande).
-2. Installe les dependances:
+1. Crée un environnement Python (optionnel mais recommandé).
+2. Installe les dépendances :
 
 ```bash
 pip install -r requirements.txt
@@ -138,7 +161,7 @@ pip install -r requirements.txt
 1. Copie `.env.example` vers `.env`.
 2. Renseigne `TG_API_ID` et `TG_API_HASH` depuis https://my.telegram.org.
 
-Au premier lancement, Telethon te demandera ton numero de telephone et le code de connexion.
+Au premier lancement, Telethon te demandera ton numéro de téléphone et le code de connexion.
 
 ### Utilisation
 
@@ -147,7 +170,7 @@ python download_telegram_photos.py "https://t.me/nomduchannel/123"
 ```
 
 Ou sans argument, le script te demandera le lien.
-Si l'envoi de code ne marche pas, utilise la connexion QR:
+Si l’envoi de code ne marche pas, utilise la connexion QR :
 
 ```bash
 python download_telegram_photos.py "https://t.me/nomduchannel/123" --qr
@@ -155,10 +178,10 @@ python download_telegram_photos.py "https://t.me/nomduchannel/123" --qr
 
 Le script affiche un QR directement dans le terminal. Il suffit de le scanner avec Telegram.
 
-### Memo rapide
+### Mémo rapide
 
 ```bash
-# Aide complete
+# Aide complète
 python download_telegram_photos.py --help
 
 # Menu interactif
@@ -167,44 +190,53 @@ python download_telegram_photos.py --menu
 # Tout le sujet (topic)
 python download_telegram_photos.py "https://t.me/nomdugroupe/123/456" --topic
 
+# Tout le canal/groupe
+python download_telegram_photos.py "https://t.me/nomduchannel/123" --all
+
+# Tout le canal/groupe (limite)
+python download_telegram_photos.py "https://t.me/nomduchannel/123" --all --limit 500
+
 # Connexion par QR
 python download_telegram_photos.py "https://t.me/..." --qr
 
-# Cache anti-doublons (actif par defaut)
+# Cache anti-doublons (actif par défaut)
 python download_telegram_photos.py "https://t.me/..."
 
-# Desactiver le cache
+# Désactiver le cache
 python download_telegram_photos.py "https://t.me/..." --no-cache
 
 # Reset cache (optionnel)
 python download_telegram_photos.py "https://t.me/..." --reset-cache
 
-# Log JSONL (actif par defaut)
+# Log JSONL (actif par défaut)
 python download_telegram_photos.py "https://t.me/..."
 
-# Desactiver le log
+# Désactiver le log
 python download_telegram_photos.py "https://t.me/..." --no-log
 
-# Filtrer photos ou videos
+# Filtrer photos ou vidéos
 python download_telegram_photos.py "https://t.me/..." --only photos
 python download_telegram_photos.py "https://t.me/..." --only videos
+
+# Ignorer les messages transférés
+python download_telegram_photos.py "https://t.me/..." --skip-forwards
 ```
 
-### UX: barre de progression + resume
+### UX : barre de progression + résumé
 
-Le script affiche une barre `tqdm` et un resume par type et taille.
+Le script affiche une barre `tqdm` et un résumé par type et taille.
 
-### Cache (eviter les doublons)
+### Cache (éviter les doublons)
 
-Le cache est **actif par defaut**.
-Un cache JSON est stocke dans `~/Downloads/Telegram/_cache/downloaded.json`.
-Pour le desactiver:
+Le cache est **actif par défaut**.
+Un cache JSON est stocké dans `~/Downloads/Telegram/_cache/downloaded.json`.
+Pour le désactiver :
 
 ```bash
 python download_telegram_photos.py "https://t.me/..." --no-cache
 ```
 
-Pour repartir de zero:
+Pour repartir de zéro :
 
 ```bash
 python download_telegram_photos.py "https://t.me/..." --reset-cache
@@ -212,8 +244,8 @@ python download_telegram_photos.py "https://t.me/..." --reset-cache
 
 ### Log JSONL
 
-Le journal est **actif par defaut** et stocke dans `_logs/downloads.jsonl` (a cote du script).
-Pour le desactiver:
+Le journal est **actif par défaut** et stocké dans `_logs/downloads.jsonl` (à côté du script).
+Pour le désactiver :
 
 ```bash
 python download_telegram_photos.py "https://t.me/..." --no-log
@@ -221,10 +253,24 @@ python download_telegram_photos.py "https://t.me/..." --no-log
 
 ### Sujet (topic) complet
 
-Pour telecharger tous les medias d'un sujet (forum):
+Pour télécharger tous les médias d’un sujet (forum) :
 
 ```bash
 python download_telegram_photos.py "https://t.me/nomdugroupe/123/456" --topic
+```
+
+### Canal/groupe complet
+
+Pour télécharger tous les médias d’un canal ou groupe :
+
+```bash
+python download_telegram_photos.py "https://t.me/nomduchannel/123" --all
+```
+
+Limiter le scan :
+
+```bash
+python download_telegram_photos.py "https://t.me/nomduchannel/123" --all --limit 500
 ```
 
 ### Menu interactif
@@ -233,16 +279,16 @@ python download_telegram_photos.py "https://t.me/nomdugroupe/123/456" --topic
 python download_telegram_photos.py --menu
 ```
 
-Les medias sont telecharges dans `~/Downloads/Telegram/<channel>/<message_id>/`.
-Dans un groupe avec sujets (forum), le dossier prend le nom du sujet quand il est detecte.
+Les médias sont téléchargés dans `~/Downloads/Telegram/<channel>/<message_id>/`.
+Dans un groupe avec sujets (forum), le dossier prend le nom du sujet quand il est détecté.
 
-### Types de liens supportes
+### Types de liens supportés
 
 - `https://t.me/nomduchannel/123`
-- `https://t.me/c/123456/789` (channels/groupes prives ou non publics)
+- `https://t.me/c/123456/789` (channels/groupes privés ou non publics)
 
 ### Notes
 
 - Le script utilise ton compte Telegram (pas de bot).
-- Il telecharge les images et les videos.
-- Il fonctionne seulement si tu as acces au message.
+- Il télécharge les images et les vidéos.
+- Il fonctionne seulement si tu as accès au message.
