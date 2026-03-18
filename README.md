@@ -29,7 +29,7 @@ At first run, Telethon will ask for your phone number and the login code.
 python download_telegram_photos.py "https://t.me/channelname/123"
 ```
 
-If code delivery does not work, use QR login:
+If you don't receive the code, use QR login:
 
 ```bash
 python download_telegram_photos.py "https://t.me/channelname/123" --qr
@@ -144,6 +144,12 @@ In forum groups, the folder uses the topic name when available.
 - It downloads images and videos.
 - It only works if you can access the message.
 
+### Troubleshooting
+
+- **No code received**: use `--qr` to login by scanning a QR code.
+- **Message not found**: make sure the link is correct and you have access to the chat.
+- **No media found**: the message may not contain photos/videos, or the link points to the wrong message.
+
 ## Français
 
 Petit script Python pour télécharger les photos et vidéos d’un message Telegram (y compris les albums) à partir d’un lien t.me.
@@ -172,7 +178,7 @@ python download_telegram_photos.py "https://t.me/nomduchannel/123"
 ```
 
 Ou sans argument, le script te demandera le lien.
-Si l’envoi de code ne marche pas, utilise la connexion QR :
+Si tu ne reçois pas le code, utilise la connexion QR :
 
 ```bash
 python download_telegram_photos.py "https://t.me/nomduchannel/123" --qr
@@ -294,3 +300,9 @@ Dans un groupe avec sujets (forum), le dossier prend le nom du sujet quand il es
 - Le script utilise ton compte Telegram (pas de bot).
 - Il télécharge les images et les vidéos.
 - Il fonctionne seulement si tu as accès au message.
+
+### Dépannage
+
+- **Code non reçu** : utilise `--qr` pour te connecter via QR code.
+- **Message introuvable** : vérifie le lien et tes accès au chat.
+- **Aucun média trouvé** : le message ne contient peut-être pas de photos/vidéos, ou le lien pointe vers un autre message.
