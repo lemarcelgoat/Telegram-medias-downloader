@@ -15,8 +15,10 @@ from telethon.tl.types import PeerChannel
 
 LINK_RE = re.compile(
     r"(?:https?://)?t\.me/"
-    r"(?:(?P<username>[A-Za-z0-9_]+)/(?P<msgid>\d+)(?:/(?P<msgid2>\d+))?"
-    r"|c/(?P<cid>\d+)/(?P<cmsgid>\d+)(?:/(?P<cmsgid2>\d+))?)",
+    r"(?:"
+    r"c/(?P<cid>\d+)/(?P<cmsgid>\d+)(?:/(?P<cmsgid2>\d+))?"
+    r"|(?P<username>(?!c/)[A-Za-z0-9_]+)/(?P<msgid>\d+)(?:/(?P<msgid2>\d+))?"
+    r")",
     re.IGNORECASE,
 )
 
