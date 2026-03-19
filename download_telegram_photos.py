@@ -111,7 +111,7 @@ def build_output_dir(base: Path, entity, msg_id: int, topic_title: str | None) -
     label = sanitize_name(str(label))
     if topic_title:
         return base / label / sanitize_name(topic_title)
-    return base / label / str(msg_id)
+    return base / label
 
 
 def build_channel_root(base: Path, entity) -> Path:
