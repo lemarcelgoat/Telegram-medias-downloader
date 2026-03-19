@@ -418,6 +418,8 @@ async def main():
             print(f"Debug topic_title: {topic_title!r}")
         if args.all and not topic_title:
             output_dir = build_channel_root(output_base, entity)
+        elif not topic_title and not args.all and not args.topic:
+            output_dir = build_channel_root(output_base, entity)
         else:
             output_dir = build_output_dir(output_base, entity, message.id, topic_title)
         output_dir.mkdir(parents=True, exist_ok=True)
